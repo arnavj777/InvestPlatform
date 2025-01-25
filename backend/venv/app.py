@@ -19,11 +19,7 @@ def hello_world():
 def pipe():
     payload = {}
     headers = {}
-<<<<<<< HEAD
     url = "https://demo-live-data.highcharts.com/aapl-ohlcv.json"
-=======
-    url = "https://demo-live-data.highcharts.com/amzn-ohlcv.json"
->>>>>>> 930d4b6 (Stock Graph)
     r = requests.get(url, headers=headers, data ={})
     r = r.json()
     return {"res":r}
