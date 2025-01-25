@@ -19,7 +19,7 @@ def hello_world():
 def pipe():
     payload = {}
     headers = {}
-    url = "https://demo-live-data.highcharts.com/amzn-ohlcv.json"
+    url = "https://demo-live-data.highcharts.com/aapl-ohlcv.json"
     r = requests.get(url, headers=headers, data ={})
     r = r.json()
     return {"res":r}

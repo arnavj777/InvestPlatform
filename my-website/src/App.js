@@ -30,7 +30,7 @@ function App() {
         });
 
         setChartData(chartData);
-        setVolumeData(volumeData);
+        
       });
   }, []);
 
