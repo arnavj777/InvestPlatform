@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import './App.css'
 
 function App() {
-  const entry_click = () => {
-    console.log("entry click");
+  const symbol_sumbit = () => {
+    console.log("Input Value", symbol_input)
   }
   const [message, setMessage] = useState('');
 
@@ -33,8 +33,14 @@ function App() {
         <div style={{ width: "100%", height: "100vh", backgroundColor: "#0D1117", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
           <div style={{ width: "90%", height: "50%", backgroundColor: "#141820", marginBottom: "20px", borderRadius: "8px" }}></div>
           <div style={{ width: "90%", height: "30%", backgroundColor: "#2765c2", borderRadius: "8px" }}>
-            <h1>Yolo</h1>
-            <button onClick={entry_click} className="custom-button">Click me</button>
+            
+            <div>
+              <label htmlFor='textInput'>
+                Enter Stock Symbol
+              </label>
+              <input id="textInput" type="text" value={symbol_input}></input>
+            </div>
+            
           </div>
         </div>
       </div>
