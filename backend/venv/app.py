@@ -1,8 +1,9 @@
-from flask import Flask, jsonify
-from flask_cors import CORS
+from flask import Flask, jsonify, Response
+import pandas as pd
+import mplfinance as mpf
+import io
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
 
 @app.route('/api/data')
 def get_data():
