@@ -123,30 +123,22 @@ def add_all_factors(symbol):
     add_percent_macd(symbol)
     add_atr(symbol)
     add_obv(symbol)
+    add_stochastic(symbol)
+    add_williams_r(symbol)
+    add_ichimoku(symbol)
+    add_cmo(symbol)
     add_entry_strat_field(symbol)
     add_exit_strat_field(symbol)
 
 # Entry Strat
 def add_entry_strat_field(symbol):
-    data = pd.read_csv(os.path.join(backend_dir, f'{symbol}_data.csv'))
-
-    data.loc[:, 'Entry_Strat'] = [0] * len(data)
-    # Save Data to a CSV File
-    filename = os.path.join(backend_dir, f'{symbol}_data.csv')
-    data.to_csv(filename, index=False)
-
-    print(f'Added Entry Strat')
+    f = open(os.path.join(sims_dir, f'{symbol}_entry.txt'),'w')
+    f.close()
 
 # Exit Strat
 def add_exit_strat_field(symbol):
-    data = pd.read_csv(os.path.join(backend_dir, f'{symbol}_data.csv'))
-
-    data.loc[:, 'Exit_Strat'] = [0] * len(data)
-    # Save Data to a CSV File
-    filename = os.path.join(backend_dir, f'{symbol}_data.csv')
-    data.to_csv(filename, index=False)
-
-    print(f'Added Exit Strat')
+    f = open(os.path.join(sims_dir, f'{symbol}_exit.txt'),'w')
+    f.close()
 
 # RSI
 def add_rsi(symbol):
@@ -206,7 +198,7 @@ def add_momentum_ratio(symbol):
     data = pd.read_csv(os.path.join(backend_dir, f'{symbol}_data.csv'))
 
     # Momentum: Difference between current close and close 10 days ago
-    data.loc[:, 'Momentum Ratio'] = data['Close'] - data['Close'].shift(10)
+    data.loc[:, 'Momentum Ratio'] = (data['Close'] - data['Close'].shift(10))/ data['Close'].shift(10)
 
     # Dropping NaN Rows
     data.dropna(inplace=True)
@@ -245,7 +237,7 @@ def add_atr(symbol):
                       abs(x['Low'] - x['Close'])), axis=1)
 
     # Calculate Average True Range (ATR)
-    data['ATR'] = data['TR'].rolling(window=14).mean()
+    data['ATR'] = data['TR'].rolling(window=14).mean()/ data['Close']
 
     # Dropping NaN Rows
     data.dropna(inplace=True)
@@ -259,7 +251,7 @@ def add_atr(symbol):
 def add_obv(symbol):
     data = pd.read_csv(os.path.join(backend_dir, f'{symbol}_data.csv'))
 
-    # Calculate On-Balance Volume
+    # On-Balance Volume Normalized by Total Volume
     data['OBV'] = 0
     for i in range(1, len(data)):
         if data.loc[i, 'Close'] > data.loc[i - 1, 'Close']:
@@ -268,37 +260,131 @@ def add_obv(symbol):
             data.loc[i, 'OBV'] = data.loc[i - 1, 'OBV'] - data.loc[i, 'Volume']
         else:
             data.loc[i, 'OBV'] = data.loc[i - 1, 'OBV']
+    data['OBV Ratio'] = data['OBV'] / data['Volume'].sum()
 
-    # Save Data to a CSV File
+    data.dropna(inplace=True)
+    data.reset_index(drop=True, inplace=True)
+
     filename = os.path.join(backend_dir, f'{symbol}_data.csv')
     data.to_csv(filename, index=False)
-    print(f'Added On-Balance Volume')
+    print(f'Added OBV (as Ratio)')
 
-def getSentiment(Stock,time):
-    import os
-    import google.generativeai as genai
+# def add_Sentiment(symbol, time):
+#     import os
+#     import google.generativeai as genai
+#     import pandas as pd
 
-    genai.configure(api_key=os.environ["AIzaSyBePnJjq6UcQIwgWoAAFtp6tbOK_G8tzDY"])
+#     # Configure API key for Gemini
+#     genai.configure(api_key=os.environ["AIzaSyBePnJjq6UcQIwgWoAAFtp6tbOK_G8tzDY"])
 
-    # Create the model
-    generation_config = {
-    "temperature": 1,
-    "top_p": 0.95,
-    "top_k": 64,
-    "max_output_tokens": 8192,
-    "response_mime_type": "text/plain",
-    }
+#     # Define the configuration for the model
+#     generation_config = {
+#         "temperature": 1,
+#         "top_p": 0.95,
+#         "top_k": 64,
+#         "max_output_tokens": 8192,
+#         "response_mime_type": "text/plain",
+#     }
 
-    model = genai.GenerativeModel(
-    model_name="learnlm-1.5-pro-experimental",
-    generation_config=generation_config,
-    system_instruction=f"Analyze the {Stock} over the timeperiod {time} output a number from 0 to 100, 0 being worst sentiment 100 being best sentiment",
-    )
+#     # Initialize the generative model
+#     model = genai.GenerativeModel(
+#         model_name="learnlm-1.5-pro-experimental",
+#         generation_config=generation_config,
+#         system_instruction=(
+#             f"Analyze the sentiment for the stock symbol {symbol} over the time period {time}. "
+#             "Output a list of sentiment scores (0 to 100) for each trading day in the given period. "
+#             "Scores closer to 0 indicate negative sentiment, and closer to 100 indicate positive sentiment."
+#         ),
+#     )
 
-    chat_session = model.start_chat(
-    
-    )
+#     # Start a chat session and generate the sentiment response
+#     chat_session = model.start_chat()
+#     response = chat_session.send_message("Provide the sentiment scores as a list.")
 
-    response = chat_session.send_message("INSERT_INPUT_HERE")
+#     # Parse the response to extract sentiment values (assumes response text is JSON formatted)
+#     sentiment_scores = eval(response.text)  # Use `json.loads` if response text is in JSON format
 
-    return (response.text)
+#     # Load the existing dataset
+#     filename = os.path.join(backend_dir, f'{symbol}_data.csv')
+#     data = pd.read_csv(filename)
+
+#     # Add the sentiment scores as a new column
+#     if len(sentiment_scores) == len(data):
+#         data['Sentiment'] = sentiment_scores
+#     else:
+#         raise ValueError("Mismatch between sentiment scores and dataset length.")
+
+#     # Save the updated dataset to the same CSV file
+#     data.to_csv(filename, index=False)
+#     print(f'Added Sentiment scores to {symbol} data.')
+
+#     return data
+
+
+
+def add_stochastic(symbol):
+    data = pd.read_csv(os.path.join(backend_dir, f'{symbol}_data.csv'))
+
+    data['14 High'] = data['High'].rolling(window=14).max()
+    data['14 Low'] = data['Low'].rolling(window=14).min()
+    data['Stochastic'] = 100 * (data['Close'] - data['14 Low']) / (data['14 High'] - data['14 Low'])
+
+    data.drop(columns=['14 High', '14 Low'], inplace=True)
+    data.dropna(inplace=True)
+    data.reset_index(drop=True, inplace=True)
+
+    filename = os.path.join(backend_dir, f'{symbol}_data.csv')
+    data.to_csv(filename, index=False)
+    print(f'Added Stochastic Oscillator')
+
+
+def add_williams_r(symbol):
+    data = pd.read_csv(os.path.join(backend_dir, f'{symbol}_data.csv'))
+
+    data['14 High'] = data['High'].rolling(window=14).max()
+    data['14 Low'] = data['Low'].rolling(window=14).min()
+    data['Williams %R'] = -100 * (data['14 High'] - data['Close']) / (data['14 High'] - data['14 Low'])
+
+    data.drop(columns=['14 High', '14 Low'], inplace=True)
+    data.dropna(inplace=True)
+    data.reset_index(drop=True, inplace=True)
+
+    filename = os.path.join(backend_dir, f'{symbol}_data.csv')
+    data.to_csv(filename, index=False)
+    print(f'Added Williams %R')
+
+
+
+def add_ichimoku(symbol):
+    data = pd.read_csv(os.path.join(backend_dir, f'{symbol}_data.csv'))
+
+    data['Tenkan-Sen'] = (data['High'].rolling(window=9).max() + data['Low'].rolling(window=9).min()) / 2
+    data['Kijun-Sen'] = (data['High'].rolling(window=26).max() + data['Low'].rolling(window=26).min()) / 2
+    data['Senkou Span A'] = ((data['Tenkan-Sen'] + data['Kijun-Sen']) / 2).shift(26)
+    data['Senkou Span B'] = ((data['High'].rolling(window=52).max() + data['Low'].rolling(window=52).min()) / 2).shift(26)
+
+    data.dropna(inplace=True)
+    data.reset_index(drop=True, inplace=True)
+
+    filename = os.path.join(backend_dir, f'{symbol}_data.csv')
+    data.to_csv(filename, index=False)
+    print(f'Added Ichimoku Cloud')
+
+
+def add_cmo(symbol):
+    data = pd.read_csv(os.path.join(backend_dir, f'{symbol}_data.csv'))
+
+    data['Up'] = np.where(data['Close'] > data['Close'].shift(1), data['Close'] - data['Close'].shift(1), 0)
+    data['Down'] = np.where(data['Close'] < data['Close'].shift(1), data['Close'].shift(1) - data['Close'], 0)
+    sum_up = data['Up'].rolling(window=14).sum()
+    sum_down = data['Down'].rolling(window=14).sum()
+
+    data['CMO'] = 100 * (sum_up - sum_down) / (sum_up + sum_down)
+
+    data.drop(columns=['Up', 'Down'], inplace=True)
+    data.dropna(inplace=True)
+    data.reset_index(drop=True, inplace=True)
+
+    filename = os.path.join(backend_dir, f'{symbol}_data.csv')
+    data.to_csv(filename, index=False)
+    print(f'Added Chande Momentum Oscillator')

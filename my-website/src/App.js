@@ -8,7 +8,7 @@ function App() {
   return (
     <Router>
       <nav className="navbar">
-        <div className="logo">Logo</div>
+        <div className="logo">Algo Tester</div>
         <div className="nav-links">
           <Link to="/" className="nav-link">Home</Link> {/* Link to the Home page */}
           <Link to="/Simulations" className="nav-link">Simulations</Link> {/* Link to the About page */}

@@ -57,6 +57,18 @@ def add_exit_f():
     sim.add_exit_condition(condition[0], condition[1])
     return {}
 
+@app.route('/remove_entry_f', methods=["GET", "POST"])
+def remove_entry_f():
+    data = request.get_json()
+    condition = (data.get('condition', '')).split(':')  # Default to 'AAPL' if symbol is not provided
+    sim.delete_entry_condition(condition[0], condition[1])
+
+@app.route('/remove_exit_f', methods=["GET", "POST"])
+def remove_exit_f():
+    data = request.get_json()
+    condition = (data.get('condition', '')).split(':')  # Default to 'AAPL' if symbol is not provided
+    sim.delete_exit_condition(condition[0], condition[1])
+
 @app.route('/run_sim', methods=["GET", "POST"])
 def run_sim():
     # Get the JSON data sent from React
@@ -65,33 +77,49 @@ def run_sim():
     print(timeframe)
     sim.crop_dataset(timeframe[0],timeframe[1])
     sim.simulate()
-    sim.plot_sim()
+    # sim.plot_sim()
     return {}
 
 @app.route('/sim_charts', methods=['GET', 'POST'])
 def sim_charts():
     filenames = os.listdir(sims_dir)
-    print(filenames)
     charts = []
-    for i, filename in enumerate(filenames):
-        data = pd.read_csv(os.path.join(sims_dir, filename))
+    for filename in filenames:
+        # Ensure the filename ends with .csv
+        if filename.endswith('.csv'):
+            symbol = filename.split('_')[0]  # Extract the symbol from the filename
+            csv_path = os.path.join(sims_dir, filename)
+            txt_path_1 = os.path.join(sims_dir, f"{symbol}_entry.txt")  # Corresponding text file
+            print(txt_path_1)
+            txt_path_2 = os.path.join(sims_dir, f"{symbol}_exit.txt")  # Corresponding text file
+            txt1 = open(txt_path_1, 'r')
+            txt1.seek(0)
+            txt2 = open(txt_path_2, 'r')
+            txt2.seek(0)
 
-        # Convert 'Date' and 'Balance' to lists
-        dates = data['Date'].tolist()
-        balances = data['Balance'].tolist()
+            # Read CSV data
+            data = pd.read_csv(csv_path)
+            dates = data['Date'].tolist()
+            balances = data['Balance'].tolist()
 
-        # Append chart configuration
-        charts.append({
-            "chart": {"type": "line"},
-            "title": {"text": f"{filename.split('_')[0]}"},
-            "xAxis": {"categories": dates},  # Use the converted list
-            "yAxis": {"title": {"text": "Values"}},
-            "series": [
-                {"name": f"Dataset {i + 1}", "data": balances}  # Use the converted list
-            ]
-        })
+            # Read TXT file if it exists
+            txt_data = []
+            txt_data += ['Entry:']+txt1.read().split("\n")[:-1]
+            txt_data += ['Exit:']+txt2.read().split("\n")[:-1]
 
+            # Append chart configuration
+            charts.append({
+                "symbol": symbol,
+                "chart": {"type": "line"},
+                "title": {"text": f"{symbol} Chart"},
+                "xAxis": {"categories": dates},
+                "yAxis": {"title": {"text": "Balance"}},
+                "series": [{"name": f"{symbol} Dataset", "data": balances}],
+                "textData": txt_data  # Include text file content
+            })
+    # print(charts)  # Debug output
     return jsonify(charts)
+
     
 
 if __name__ == '__main__':

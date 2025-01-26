@@ -24,33 +24,23 @@ class simulation():
     def add_entry_condition(self, factor, argument):
         self.entry_mng.add_condition(factor, argument)
 
-        # Load the data
-        data = pd.read_csv(os.path.join(backend_dir, f'{self.symbol}_data.csv'))
-
-        for i, row in data.iterrows():
-            if row.Entry_Strat == 0:
-                data.at[i, 'Entry_Strat'] = f'{factor} {argument}'
-                break
-
-        # Save Data to a CSV File
-        filename = os.path.join(backend_dir, f'{self.symbol}_data.csv')
-        data.to_csv(filename, index=False)
+        f = open(os.path.join(sims_dir, f'{self.symbol}_entry.txt'),'a')
+        f.write( f'{factor} {argument}\n')
+        f.close()
 
 
     def add_exit_condition(self, factor, argument):
         self.exit_mng.add_condition(factor, argument)
 
-        # Load the data
-        data = pd.read_csv(os.path.join(backend_dir, f'{self.symbol}_data.csv'))
-        
-        for i, row in data.iterrows():
-            if row.Entry_Strat == 0:
-                data.at[i, 'Exit_Strat'] = f'{factor} {argument}'
-                break
-        
-        # Save Data to a CSV File
-        filename = os.path.join(backend_dir, f'{self.symbol}_data.csv')
-        data.to_csv(filename, index=False)
+        f = open(os.path.join(sims_dir, f'{self.symbol}_exit.txt'),'a')
+        f.write( f'{factor} {argument}\n')
+        f.close()
+    
+    def delete_entry_condition(self, factor, arguement):
+        self.entry_mng.delete_condition(factor, arguement)
+
+    def delete_exit_condition(self, factor, arguement):
+        self.exit_mng.delete_condition(factor, arguement)
 
     
     def crop_dataset(self, start_date, end_date):
@@ -94,3 +84,4 @@ class simulation():
         plt.show()
 
 
+    

@@ -60,6 +60,18 @@ function Simulations() {
               }}
             >
               <HighchartsReact highcharts={Highcharts} options={chartOptions} />
+              
+              <h3>{chartOptions.symbol} Additional Info</h3>
+              {chartOptions.textData && chartOptions.textData.length > 0 ? (
+                <ul>
+                  {chartOptions.textData.map((line, idx) => (
+                    <li key={idx}>{line}</li>
+                  ))}
+                </ul>
+              ) : (
+                <h6>No additional data available.</h6>
+              )}
+              
               <button
                 onClick={() => handleRemoveChart(index)}
                 style={{ marginTop: '10px' }}

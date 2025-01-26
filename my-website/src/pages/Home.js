@@ -22,9 +22,15 @@ function Home() {
   const technicalIndicators = [
     'Moving Average',
     'RSI',
-    'MACD',
-    'Bollinger Bands',
-    'Volume',
+    'Volatility Ratio',
+    'Momentum Ratio',
+    '% MACD',
+    'ATR',
+    'OBV',
+    'Volume Ratio',
+    'Stochastic',
+    'Williams %R',
+    'CMO'
   ];
 
   const operators = ['>', '<', '>=', '<=', '='];
@@ -101,6 +107,30 @@ function Home() {
       setExitValue('');
     }
   };
+
+  const handleEntryRemoval = (index) => {
+    const conditionToRemove = entryIndicators[index]; // Get the condition to remove
+    setEntryIndicators((prev) => prev.filter((_, i) => i !== index)); // Update state to remove it
+  
+    // Send request to backend to remove the entry condition
+    fetch('/remove_entry_f', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ condition: conditionToRemove }),
+    }).catch((error) => console.error('Error removing entry condition:', error));
+  };
+  
+  const handleExitRemoval = (index) => {
+    const conditionToRemove = exitIndicators[index]; // Get the condition to remove
+    setExitIndicators((prev) => prev.filter((_, i) => i !== index)); // Update state to remove it
+  
+    // Send request to backend to remove the exit condition
+    fetch('/remove_exit_f', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ condition: conditionToRemove }),
+    }).catch((error) => console.error('Error removing exit condition:', error));
+  };  
 
   const chartOptions = {
     rangeSelector: { selected: 1 },
@@ -206,11 +236,7 @@ function Home() {
                   <li key={index}>
                     {indicator}
                     <button
-                      onClick={() =>
-                        setEntryIndicators((prev) =>
-                          prev.filter((_, i) => i !== index)
-                        )
-                      }
+                      onClick={() => handleEntryRemoval(index)} // Call handleEntryRemoval
                       className="remove-btn"
                     >
                       Remove
@@ -226,11 +252,7 @@ function Home() {
                   <li key={index}>
                     {indicator}
                     <button
-                      onClick={() =>
-                        setExitIndicators((prev) =>
-                          prev.filter((_, i) => i !== index)
-                        )
-                      }
+                      onClick={() => handleExitRemoval(index)} // Call handleExitRemoval
                       className="remove-btn"
                     >
                       Remove
@@ -240,6 +262,7 @@ function Home() {
               </ul>
             </div>
           </div>
+
         </div>
       </div>
     </div>
