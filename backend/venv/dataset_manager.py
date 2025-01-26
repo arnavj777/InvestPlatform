@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import os
 import json
+from datetime import datetime, timedelta
 
 # ---------- Getting Directory String ----------
 root_dir = os.getcwd()
@@ -59,6 +60,20 @@ def fetch_updated_data(symbol):
 
 def crop_data(symbol, start_date, end_date):
     data = pd.read_csv(os.path.join(backend_dir, f'{symbol}_data.csv'))
+
+    # Convert start_date and end_date to datetime objects
+    start_date = datetime.strptime(start_date, '%m/%d/%Y')
+    end_date = datetime.strptime(end_date, '%m/%d/%Y')
+
+    # Adjust start_date and end_date to match available dates in the dataset
+    while not (start_date.strftime('%m/%d/%Y') in data['Date'].values):
+        start_date += timedelta(days=1)
+    while not (end_date.strftime('%m/%d/%Y') in data['Date'].values):
+        end_date -= timedelta(days=1)
+
+    # Convert back to desired string format with no leading zeros
+    start_date = start_date.strftime('%m/%d/%Y').lstrip('0').replace('/0', '/')
+    end_date = end_date.strftime('%m/%d/%Y').lstrip('0').replace('/0', '/')
     
     # Cropping Dataset
     start_i = data.loc[data['Date'] == start_date].index[0]
