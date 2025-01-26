@@ -63,6 +63,10 @@ def run_sim():
     sim.simulate()
     sim.plot_sim()
     return {}
+
+@app.route('/sim_charts', methods=['GET', 'POST'])
+def sim_charts():
+    None
     
 
 if __name__ == '__main__':

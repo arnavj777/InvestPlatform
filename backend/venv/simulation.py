@@ -5,6 +5,11 @@ from conditional import condition_manager
 from dataset_manager import *
 import matplotlib.pyplot as plt
 
+# ---------- Getting Directory String ----------
+root_dir = os.getcwd()
+backend_dir = os.path.join(root_dir, "backend\\venv\\Datasets")
+sims_dir = os.path.join(root_dir, "backend\\venv\\Simulations")
+
 class simulation():
     def __init__(self, symbol):
         self.symbol = symbol
@@ -41,6 +46,12 @@ class simulation():
                     balance *= row['Close']/self.entry_price
             balances.append(balance*(row['Close']/self.entry_price))
         self.stock_data = add_balances(self.symbol, balances)
+
+        # Save Data to a CSV File
+        filename = os.path.join(sims_dir, f'{self.symbol}_sim.csv')
+        self.stock_data.to_csv(filename, index=False)
+        print(f'Saved Sim {filename}')
+
 
     def plot_sim(self):
         plt.figure(figsize=(12, 6))

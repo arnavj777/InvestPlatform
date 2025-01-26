@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 # ---------- Getting Directory String ----------
 root_dir = os.getcwd()
 backend_dir = os.path.join(root_dir, "backend\\venv\\Datasets")
+sims_dir = os.path.join(root_dir, "backend\\venv\\Simulations")
 
 # ---------- Fetching All Symbol Data ----------
 def fetch_symbol(symbol):
@@ -66,33 +67,34 @@ def crop_data(symbol, start_date, end_date):
     end_date = datetime.strptime(end_date, '%m/%d/%Y')
 
     # Adjust start_date and end_date to match available dates in the dataset
-    while not (start_date.strftime('%m/%d/%Y') in data['Date'].values):
+    while not (start_date.strftime('%m/%d/%Y').lstrip('0').replace('/0', '/') in data['Date'].values):
         start_date += timedelta(days=1)
-    while not (end_date.strftime('%m/%d/%Y') in data['Date'].values):
+    while not (end_date.strftime('%m/%d/%Y').lstrip('0').replace('/0', '/') in data['Date'].values):
         end_date -= timedelta(days=1)
+        print(end_date)
 
     # Convert back to desired string format with no leading zeros
     start_date = start_date.strftime('%m/%d/%Y').lstrip('0').replace('/0', '/')
     end_date = end_date.strftime('%m/%d/%Y').lstrip('0').replace('/0', '/')
-    
+
     # Cropping Dataset
     start_i = data.loc[data['Date'] == start_date].index[0]
     end_i = data.loc[data['Date'] == end_date].index[0]
     data = data.iloc[start_i:end_i+1]
 
     # Save Data to a CSV File
-    filename = os.path.join(backend_dir, f'{symbol}_data.csv')
+    filename = os.path.join(sims_dir, f'{symbol}_sim.csv')
     data.to_csv(filename, index=False)
     print(f'Cropped {symbol}: {start_date}:{end_date}')
 
     return data
 
 def add_balances(symbol, balances):
-    data = pd.read_csv(os.path.join(backend_dir, f'{symbol}_data.csv'))
+    data = pd.read_csv(os.path.join(sims_dir, f'{symbol}_sim.csv'))
     data['Balance'] = balances
 
     # Save Data to a CSV File
-    filename = os.path.join(backend_dir, f'{symbol}_data.csv')
+    filename = os.path.join(sims_dir, f'{symbol}_sim.csv')
     data.to_csv(filename, index=False)
     print(f'Added Balance to {symbol}')
 
