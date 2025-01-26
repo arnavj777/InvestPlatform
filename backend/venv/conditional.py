@@ -7,20 +7,10 @@ class condition():
         self.arguement = arguement
 
     def check_condition(self, row):
-        # print(self.factor)
-        # print(self.factor)
-        # print(self.factor)
-        # print(self.factor)
-        # print(self.factor)
-        # print(self.factor)
-        # print(self.factor)
-        # print(self.factor)
         data_p = row[self.factor]
-        print(self.arguement)
         ints = ['0','1','2','3','4','5','6','7','8','9']
         int_i=1
         for i in range(len(self.arguement)):
-            print(type(self.arguement[i]))
             if self.arguement[i] in ints:
                 int_i = i
                 break
@@ -28,25 +18,19 @@ class condition():
         num = float(self.arguement[int_i:])
         if bool_op == "<=":
             if data_p <= num:
-                # print(True)
                 return True
         elif bool_op == "=":
             if data_p == num:
-                # print(True)
                 return True
         elif bool_op == ">=":
             if data_p >= num:
-                # print(True)
                 return True
         elif bool_op == ">":
             if data_p > num:
-                # print(True)
                 return True
         elif bool_op == "<":
             if data_p < num:
-                # print(True)
                 return True
-        # print(False)
         return False
         
 

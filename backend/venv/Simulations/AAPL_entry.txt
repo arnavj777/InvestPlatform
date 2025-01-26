@@ -1,1 +1,1 @@
-Momentum Ratio >0.025
+RSI <40
