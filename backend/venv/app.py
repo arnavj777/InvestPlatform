@@ -6,7 +6,7 @@ try:
     print("ALl modules Loaded ")
 except Exception as e:
     print("Error : {} ".format(e))
-
+from dataset_manager import *
 app = Flask(__name__)
 
 
@@ -19,10 +19,12 @@ def hello_world():
 def pipe():
     payload = {}
     headers = {}
+    symbol = 'AAPL'
+    json_data = csv_to_json(symbol)
     url = "https://demo-live-data.highcharts.com/aapl-ohlcv.json"
     r = requests.get(url, headers=headers, data ={})
     r = r.json()
-    return {"res":r}
+    return {"res":json.loads(json_data)}
 
 
 if __name__ == '__main__':

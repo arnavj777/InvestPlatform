@@ -2,6 +2,7 @@ import yfinance as yf
 import numpy as np
 import pandas as pd
 import os
+import json
 
 # ---------- Getting Directory String ----------
 root_dir = os.getcwd()
@@ -34,6 +35,23 @@ def fetch_symbol(symbol):
     return data
 
 # ---------- Live Dataset Functionality ----------
+def csv_to_json(symbol):
+    data = pd.read_csv(os.path.join(backend_dir, f'{symbol}_data.csv'))
+    json_dta = []
+    data['Date'] = pd.to_datetime(data['Date']).astype(int) // 10**6
+
+    json_dta = []
+    for i in range(len(data)):
+        json_dta.append([
+            data.iloc[i]['Date'],
+            data.iloc[i]['Open'],
+            data.iloc[i]['High'],
+            data.iloc[i]['Low'],
+            data.iloc[i]['Close'],
+            data.iloc[i]['Volume']
+        ])
+    return json.dumps(json_dta)
+
 def fetch_updated_data(symbol):
     data = pd.read_csv(os.path.join(backend_dir, f'{symbol}_data.csv'))
     return data
