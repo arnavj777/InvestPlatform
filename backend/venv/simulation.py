@@ -24,8 +24,34 @@ class simulation():
     def add_entry_condition(self, factor, argument):
         self.entry_mng.add_condition(factor, argument)
 
+        # Load the data
+        data = pd.read_csv(os.path.join(backend_dir, f'{self.symbol}_data.csv'))
+
+        for i, row in data.iterrows():
+            if row.Entry_Strat == 0:
+                data.at[i, 'Entry_Strat'] = f'{factor} {argument}'
+                break
+
+        # Save Data to a CSV File
+        filename = os.path.join(backend_dir, f'{self.symbol}_data.csv')
+        data.to_csv(filename, index=False)
+
+
     def add_exit_condition(self, factor, argument):
         self.exit_mng.add_condition(factor, argument)
+
+        # Load the data
+        data = pd.read_csv(os.path.join(backend_dir, f'{self.symbol}_data.csv'))
+        
+        for i, row in data.iterrows():
+            if row.Entry_Strat == 0:
+                data.at[i, 'Exit_Strat'] = f'{factor} {argument}'
+                break
+        
+        # Save Data to a CSV File
+        filename = os.path.join(backend_dir, f'{self.symbol}_data.csv')
+        data.to_csv(filename, index=False)
+
     
     def crop_dataset(self, start_date, end_date):
         self.stock_data = crop_data(self.symbol, start_date, end_date)

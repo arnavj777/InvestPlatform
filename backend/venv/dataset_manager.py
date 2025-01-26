@@ -123,7 +123,30 @@ def add_all_factors(symbol):
     add_percent_macd(symbol)
     add_atr(symbol)
     add_obv(symbol)
+    add_entry_strat_field(symbol)
+    add_exit_strat_field(symbol)
 
+# Entry Strat
+def add_entry_strat_field(symbol):
+    data = pd.read_csv(os.path.join(backend_dir, f'{symbol}_data.csv'))
+
+    data.loc[:, 'Entry_Strat'] = [0] * len(data)
+    # Save Data to a CSV File
+    filename = os.path.join(backend_dir, f'{symbol}_data.csv')
+    data.to_csv(filename, index=False)
+
+    print(f'Added Entry Strat')
+
+# Exit Strat
+def add_exit_strat_field(symbol):
+    data = pd.read_csv(os.path.join(backend_dir, f'{symbol}_data.csv'))
+
+    data.loc[:, 'Exit_Strat'] = [0] * len(data)
+    # Save Data to a CSV File
+    filename = os.path.join(backend_dir, f'{symbol}_data.csv')
+    data.to_csv(filename, index=False)
+
+    print(f'Added Exit Strat')
 
 # RSI
 def add_rsi(symbol):

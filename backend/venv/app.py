@@ -45,7 +45,7 @@ def pipe():
 def add_entry_f():
     # Get the JSON data sent from React
     data = request.get_json()
-    condition = (data.get('condition', 'RSI:<=30')).split(':')  # Default to 'AAPL' if symbol is not provided
+    condition = (data.get('condition', 'RSI:<=30')).split(':')  # Default to 'AAPL' if symbol is not provide
     sim.add_entry_condition(condition[0], condition[1])
     return {}
 
