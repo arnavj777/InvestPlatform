@@ -8,12 +8,14 @@
 }
 
 .navbar {
-  width: 100%;
+  /* width: 100vw; */
   height: 60px;
+  
   background-color: #007bff;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  padding: 0 0px;
+  padding: 0 20px;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
 }
 
@@ -25,9 +27,10 @@
 }
 
 .nav-links {
-  margin-left: auto;
+  /* margin-left: auto; */
   display: flex;
-  gap: 20px;
+  gap: 20px;  
+  padding-right: 20px
 }
 
 .nav-link {
@@ -40,7 +43,7 @@
 
 .main-content {
   width: 100%;
-  padding: 20px;
+  padding: 20px 0px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -148,3 +151,4 @@ p {
   margin-bottom: 8px; /* Add spacing between list items */
   font-size: 14px;
 }
+
