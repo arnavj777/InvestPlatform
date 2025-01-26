@@ -1,6 +1,6 @@
 try:
     import json
-    from flask import Flask, render_template,make_response,request
+    from flask import Flask, render_template,make_response,request, jsonify
     import requests
     import json
     print("ALl modules Loaded ")
@@ -71,11 +71,27 @@ def run_sim():
 @app.route('/sim_charts', methods=['GET', 'POST'])
 def sim_charts():
     filenames = os.listdir(sims_dir)
+    print(filenames)
     charts = []
-    for i in range(filenames):
-        data = pd.read_csv(os.path.join(sims_dir, f'{filenames[i]}_sims.csv'))
-        charts.append([data['Date'], data['Balance']])
-    return charts
+    for i, filename in enumerate(filenames):
+        data = pd.read_csv(os.path.join(sims_dir, filename))
+
+        # Convert 'Date' and 'Balance' to lists
+        dates = data['Date'].tolist()
+        balances = data['Balance'].tolist()
+
+        # Append chart configuration
+        charts.append({
+            "chart": {"type": "line"},
+            "title": {"text": f"Balance Chart {i + 1}"},
+            "xAxis": {"categories": dates},  # Use the converted list
+            "yAxis": {"title": {"text": "Values"}},
+            "series": [
+                {"name": f"Dataset {i + 1}", "data": balances}  # Use the converted list
+            ]
+        })
+
+    return jsonify(charts)
     
 
 if __name__ == '__main__':
