@@ -30,7 +30,8 @@ function Home() {
     'Volume Ratio',
     'Stochastic',
     'Williams %R',
-    'CMO'
+    'CMO',
+    'Sentiment'
   ];
 
   const operators = ['>', '<', '>=', '<=', '='];

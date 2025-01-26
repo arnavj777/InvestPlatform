@@ -1,1 +1,1 @@
-Momentum Ratio <0.024
+Sentiment <40

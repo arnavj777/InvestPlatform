@@ -129,6 +129,10 @@ def add_all_factors(symbol):
     add_cmo(symbol)
     add_entry_strat_field(symbol)
     add_exit_strat_field(symbol)
+    data = pd.read_csv(os.path.join(backend_dir, f'{symbol}_data.csv'))
+
+    add_Sentiment(symbol,f'{data.iloc[0]['Date']} - {data.iloc[-1]['Date']}')
+
 
 # Entry Strat
 def add_entry_strat_field(symbol):
@@ -269,56 +273,56 @@ def add_obv(symbol):
     data.to_csv(filename, index=False)
     print(f'Added OBV (as Ratio)')
 
-# def add_Sentiment(symbol, time):
-#     import os
-#     import google.generativeai as genai
-#     import pandas as pd
+def add_Sentiment(symbol,time):
+    import os
+    import google.generativeai as genai
+    import pandas as pd
 
-#     # Configure API key for Gemini
-#     genai.configure(api_key=os.environ["AIzaSyBePnJjq6UcQIwgWoAAFtp6tbOK_G8tzDY"])
+    # Configure API key for Gemini
+    genai.configure(api_key=os.environ["AIzaSyBePnJjq6UcQIwgWoAAFtp6tbOK_G8tzDY"])
 
-#     # Define the configuration for the model
-#     generation_config = {
-#         "temperature": 1,
-#         "top_p": 0.95,
-#         "top_k": 64,
-#         "max_output_tokens": 8192,
-#         "response_mime_type": "text/plain",
-#     }
+    #   Define the configuration for the model
+    generation_config = {
+        "temperature": 1,
+        "top_p": 0.95,
+        "top_k": 64,
+        "max_output_tokens": 8192,
+        "response_mime_type": "text/plain"
+    }
 
-#     # Initialize the generative model
-#     model = genai.GenerativeModel(
-#         model_name="learnlm-1.5-pro-experimental",
-#         generation_config=generation_config,
-#         system_instruction=(
-#             f"Analyze the sentiment for the stock symbol {symbol} over the time period {time}. "
-#             "Output a list of sentiment scores (0 to 100) for each trading day in the given period. "
-#             "Scores closer to 0 indicate negative sentiment, and closer to 100 indicate positive sentiment."
-#         ),
-#     )
+    # Initialize the generative model
+    model = genai.GenerativeModel(
+        model_name="learnlm-1.5-pro-experimental",
+        generation_config=generation_config,
+        system_instruction=(
+            f"Analyze the sentiment for the stock symbol {symbol} over the time period {time}. "
+            "Output a list of sentiment scores (0 to 100) for each trading day in the given period. "
+            "Scores closer to 0 indicate negative sentiment, and closer to 100 indicate positive sentiment."
+        ),
+    )
 
-#     # Start a chat session and generate the sentiment response
-#     chat_session = model.start_chat()
-#     response = chat_session.send_message("Provide the sentiment scores as a list.")
+    # Start a chat session and generate the sentiment response
+    chat_session = model.start_chat()
+    response = chat_session.send_message("Provide the sentiment scores as a list.")
 
-#     # Parse the response to extract sentiment values (assumes response text is JSON formatted)
-#     sentiment_scores = eval(response.text)  # Use `json.loads` if response text is in JSON format
+    # Parse the response to extract sentiment values (assumes response text is JSON formatted)
+    sentiment_scores = eval(response.text)  # Use `json.loads` if response text is in JSON format
 
-#     # Load the existing dataset
-#     filename = os.path.join(backend_dir, f'{symbol}_data.csv')
-#     data = pd.read_csv(filename)
+    # Load the existing dataset
+    filename = os.path.join(backend_dir, f'{symbol}_data.csv')
+    data = pd.read_csv(filename)
 
-#     # Add the sentiment scores as a new column
-#     if len(sentiment_scores) == len(data):
-#         data['Sentiment'] = sentiment_scores
-#     else:
-#         raise ValueError("Mismatch between sentiment scores and dataset length.")
+    # Add the sentiment scores as a new column
+    if len(sentiment_scores) == len(data):
+        data['Sentiment'] = sentiment_scores
+    else:
+        raise ValueError("Mismatch between sentiment scores and dataset length.")
 
-#     # Save the updated dataset to the same CSV file
-#     data.to_csv(filename, index=False)
-#     print(f'Added Sentiment scores to {symbol} data.')
+    # Save the updated dataset to the same CSV file
+    data.to_csv(filename, index=False)
+    print(f'Added Sentiment scores to {symbol} data.')
 
-#     return data
+    return data
 
 
 
