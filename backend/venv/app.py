@@ -83,7 +83,7 @@ def sim_charts():
         # Append chart configuration
         charts.append({
             "chart": {"type": "line"},
-            "title": {"text": f"Balance Chart {i + 1}"},
+            "title": {"text": f"{filename.split('_')[0]}"},
             "xAxis": {"categories": dates},  # Use the converted list
             "yAxis": {"title": {"text": "Values"}},
             "series": [

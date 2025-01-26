@@ -13,7 +13,7 @@ sims_dir = os.path.join(root_dir, "backend\\venv\\Simulations")
 # ---------- Fetching All Symbol Data ----------
 def fetch_symbol(symbol):
     # Fetching Data From YF
-    data = yf.download(symbol, period="max")
+    data = yf.download(symbol, period="max", auto_adjust=True)
 
     # Setting Up The Date Column & Cleaning Structure
     data.reset_index(inplace=True)
