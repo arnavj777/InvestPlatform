@@ -15,26 +15,27 @@ def fetch_symbol(symbol):
 
     # Setting Up The Date Column & Cleaning Structure
     data.reset_index(inplace=True)
-    data['Date'] = data['Date'].dt.strftime('%Y-%m-%d')  # Convert Date to strings
+    data['Date'] = data['Date'].dt.strftime('%m/%d/%Y').str.lstrip('0').str.replace('/0', '/')
     data.columns = data.columns.get_level_values(0)  # Removes multi-header structure
 
     # Adding Return Feature
     data['Return'] = data['Close'].pct_change()
     data.dropna(inplace=True)
-
-    # Getting The First & Last Dates Available
-    first_date = data.iloc[0]['Date']
-    last_date = data.iloc[len(data) - 1]['Date']
-
+    
     # Save Data to a CSV File
     filename = os.path.join(backend_dir, f'{symbol}_data.csv')
     print(filename)
     data.to_csv(filename, index=False)
 
+    add_all_factors(symbol)
+
     # Returns The Timeframe Available
     return data
 
 # ---------- Live Dataset Functionality ----------
+def get_symbol(symbol):
+    data = pd.read_csv(os.path.join(backend_dir, f'{symbol}_data.csv'))
+    return data
 def csv_to_json(symbol):
     data = pd.read_csv(os.path.join(backend_dir, f'{symbol}_data.csv'))
     json_dta = []
@@ -95,6 +96,13 @@ def add_factor(symbol, factor):
         add_momentum_ratio(symbol)
     elif factor == 'Percent MACD':
         add_percent_macd(symbol)
+
+def add_all_factors(symbol):
+    add_rsi(symbol)
+    add_volume_ratio(symbol)
+    add_volatility_ratio(symbol)
+    add_momentum_ratio(symbol)
+    add_percent_macd(symbol)
 
 
 # RSI

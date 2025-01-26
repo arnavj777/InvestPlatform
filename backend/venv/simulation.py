@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 class simulation():
     def __init__(self, symbol):
         self.symbol = symbol
-        self.stock_data = fetch_symbol(self.symbol)
+        self.stock_data = get_symbol(self.symbol)
         self.entry_mng = condition_manager()
         self.exit_mng = condition_manager()
         

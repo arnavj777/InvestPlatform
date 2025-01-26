@@ -33,6 +33,7 @@ class condition_manager():
 
     def add_condition(self, factor, arguement):
         self.conditions.append(condition(factor, arguement))
+        print(f'condition {factor} {arguement} added')
 
 
 
