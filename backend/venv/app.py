@@ -1,6 +1,6 @@
 try:
     import json
-    from flask import Flask, render_template,make_response,request
+    from flask import Flask, render_template,make_response,request, jsonify
     import requests
     import json
     print("ALl modules Loaded ")
@@ -11,6 +11,10 @@ from simulation import simulation
 
 app = Flask(__name__)
 sim = simulation('AAPL')
+# ---------- Getting Directory String ----------
+root_dir = os.getcwd()
+backend_dir = os.path.join(root_dir, "backend\\venv\\Datasets")
+sims_dir = os.path.join(root_dir, "backend\\venv\\Simulations")
 
 
 @app.route('/')
@@ -63,6 +67,31 @@ def run_sim():
     sim.simulate()
     sim.plot_sim()
     return {}
+
+@app.route('/sim_charts', methods=['GET', 'POST'])
+def sim_charts():
+    filenames = os.listdir(sims_dir)
+    print(filenames)
+    charts = []
+    for i, filename in enumerate(filenames):
+        data = pd.read_csv(os.path.join(sims_dir, filename))
+
+        # Convert 'Date' and 'Balance' to lists
+        dates = data['Date'].tolist()
+        balances = data['Balance'].tolist()
+
+        # Append chart configuration
+        charts.append({
+            "chart": {"type": "line"},
+            "title": {"text": f"Balance Chart {i + 1}"},
+            "xAxis": {"categories": dates},  # Use the converted list
+            "yAxis": {"title": {"text": "Values"}},
+            "series": [
+                {"name": f"Dataset {i + 1}", "data": balances}  # Use the converted list
+            ]
+        })
+
+    return jsonify(charts)
     
 
 if __name__ == '__main__':
