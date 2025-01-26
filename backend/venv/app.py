@@ -11,6 +11,10 @@ from simulation import simulation
 
 app = Flask(__name__)
 sim = simulation('AAPL')
+# ---------- Getting Directory String ----------
+root_dir = os.getcwd()
+backend_dir = os.path.join(root_dir, "backend\\venv\\Datasets")
+sims_dir = os.path.join(root_dir, "backend\\venv\\Simulations")
 
 
 @app.route('/')
@@ -66,7 +70,12 @@ def run_sim():
 
 @app.route('/sim_charts', methods=['GET', 'POST'])
 def sim_charts():
-    None
+    filenames = os.listdir(sims_dir)
+    charts = []
+    for i in range(filenames):
+        data = pd.read_csv(os.path.join(sims_dir, f'{filenames[i]}_sims.csv'))
+        charts.append([data['Date'], data['Balance']])
+    return charts
     
 
 if __name__ == '__main__':

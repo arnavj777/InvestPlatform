@@ -3,6 +3,8 @@ import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 
 function Simulations() {
+  
+
   const [charts, setCharts] = useState([
     {
       chart: { type: 'line' },
@@ -33,6 +35,8 @@ function Simulations() {
       ],
     },
   ]);
+
+  
 
   const titleRef = useRef();
   const dataRef = useRef();

@@ -8,16 +8,28 @@ class condition():
 
     def check_condition(self, row):
         data_p = row[self.factor]
-        bool_op = self.arguement[0:2]
-        num = float(self.arguement[2:])
+        ints = ['1','2','3','4','5','6','7','8','9']
+        int_i=1
+        for i in range(len(self.arguement)):
+            if self.arguement[i] in ints:
+                int_i = i
+                break
+        bool_op = self.arguement[0:int_i]
+        num = float(self.arguement[int_i:])
         if bool_op == "<=":
             if data_p <= num:
                 return True
-        elif bool_op == "==":
+        elif bool_op == "=":
             if data_p == num:
                 return True
         elif bool_op == ">=":
             if data_p >= num:
+                return True
+        elif bool_op == ">":
+            if data_p > num:
+                return True
+        elif bool_op == "<":
+            if data_p < num:
                 return True
         return False
 

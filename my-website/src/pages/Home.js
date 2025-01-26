@@ -6,15 +6,28 @@ import './Home.css';
 function Home() {
   const [entryIndicators, setEntryIndicators] = useState([]);
   const [exitIndicators, setExitIndicators] = useState([]);
-  const entryFactorRef = useRef();
-  const exitFactorRef = useRef();
-  const symbolRef = useRef();
-
   const [minRange, setMinRange] = useState(null);
   const [maxRange, setMaxRange] = useState(null);
   const [chartData, setChartData] = useState([]);
   const [volumeData, setVolumeData] = useState([]);
   const [symbol, setSymbol] = useState('AAPL');
+
+  const [entryIndicator, setEntryIndicator] = useState('');
+  const [exitIndicator, setExitIndicator] = useState('');
+  const [entryOperator, setEntryOperator] = useState('>');
+  const [exitOperator, setExitOperator] = useState('>');
+  const [entryValue, setEntryValue] = useState('');
+  const [exitValue, setExitValue] = useState('');
+
+  const technicalIndicators = [
+    'Moving Average',
+    'RSI',
+    'MACD',
+    'Bollinger Bands',
+    'Volume',
+  ];
+
+  const operators = ['>', '<', '>=', '<=', '='];
 
   const simulate = () => {
     if (minRange && maxRange) {
@@ -30,31 +43,7 @@ function Home() {
     }
   };
 
-  const handleEntryAddition = () => {
-    const factor = entryFactorRef.current.value;
-    if (factor) {
-      setEntryIndicators((prev) => [...prev, factor]);
-      fetch('/add_entry_f', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ condition: factor }),
-      });
-      entryFactorRef.current.value = '';
-    }
-  };
-
-  const handleExitAddition = () => {
-    const factor = exitFactorRef.current.value;
-    if (factor) {
-      setExitIndicators((prev) => [...prev, factor]);
-      fetch('/add_exit_f', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ condition: factor }),
-      });
-      exitFactorRef.current.value = '';
-    }
-  };
+  const symbolRef = useRef();
 
   const handleSymbol = () => {
     const value = symbolRef.current.value;
@@ -81,6 +70,36 @@ function Home() {
       })
       .catch((error) => console.error('Error:', error));
     symbolRef.current.value = '';
+  };
+
+  const handleEntryAddition = () => {
+    if (entryIndicator && entryOperator && entryValue) {
+      const entryCondition = `${entryIndicator}:${entryOperator}${entryValue}`;
+      setEntryIndicators((prev) => [...prev, entryCondition]);
+      fetch('/add_entry_f', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ condition: entryCondition }),
+      });
+      setEntryIndicator('');
+      setEntryOperator('>');
+      setEntryValue('');
+    }
+  };
+
+  const handleExitAddition = () => {
+    if (exitIndicator && exitOperator && exitValue) {
+      const exitCondition = `${exitIndicator}:${exitOperator}${exitValue}`;
+      setExitIndicators((prev) => [...prev, exitCondition]);
+      fetch('/add_exit_f', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ condition: exitCondition }),
+      });
+      setExitIndicator('');
+      setExitOperator('>');
+      setExitValue('');
+    }
   };
 
   const chartOptions = {
@@ -112,6 +131,7 @@ function Home() {
         </div>
 
         <div className="example-section">
+          {/* Search Bar */}
           <input type="text" ref={symbolRef} placeholder="Enter Symbol" />
           <button onClick={handleSymbol}>Submit</button>
 
@@ -123,61 +143,103 @@ function Home() {
           <button onClick={simulate}>Simulate</button>
 
           <h3>ENTRY</h3>
-          <input type="text" ref={entryFactorRef} placeholder="Add Entry Indicator" />
-          <button onClick={handleEntryAddition}>Add</button>
+          <select value={entryIndicator} onChange={(e) => setEntryIndicator(e.target.value)}>
+            <option value="" disabled>
+              Select Technical Indicator
+            </option>
+            {technicalIndicators.map((indicator, index) => (
+              <option key={index} value={indicator}>
+                {indicator}
+              </option>
+            ))}
+          </select>
+
+          <select value={entryOperator} onChange={(e) => setEntryOperator(e.target.value)}>
+            {operators.map((operator, index) => (
+              <option key={index} value={operator}>
+                {operator}
+              </option>
+            ))}
+          </select>
+
+          <input
+            type="number"
+            value={entryValue}
+            onChange={(e) => setEntryValue(e.target.value)}
+            placeholder="Enter Value"
+          />
+          <button onClick={handleEntryAddition}>Add Entry</button>
 
           <h3>EXIT</h3>
-          <input type="text" ref={exitFactorRef} placeholder="Add Exit Indicator" />
-          <button onClick={handleExitAddition}>Add</button>
+          <select value={exitIndicator} onChange={(e) => setExitIndicator(e.target.value)}>
+            <option value="" disabled>
+              Select Technical Indicator
+            </option>
+            {technicalIndicators.map((indicator, index) => (
+              <option key={index} value={indicator}>
+                {indicator}
+              </option>
+            ))}
+          </select>
 
-          {/* Two-column layout for indicators */}
+          <select value={exitOperator} onChange={(e) => setExitOperator(e.target.value)}>
+            {operators.map((operator, index) => (
+              <option key={index} value={operator}>
+                {operator}
+              </option>
+            ))}
+          </select>
+
+          <input
+            type="number"
+            value={exitValue}
+            onChange={(e) => setExitValue(e.target.value)}
+            placeholder="Enter Value"
+          />
+          <button onClick={handleExitAddition}>Add Exit</button>
+
           <div className="indicators-container">
-  {/* Entry Indicators */}
-  <div className="indicators-column">
-    <h3>Current Entry Indicators</h3>
-    <ul>
-      {entryIndicators.map((indicator, index) => (
-        <li key={index}>
-          {indicator.replace(':', '')}
-          <button
-            onClick={() =>
-              setEntryIndicators((prev) =>
-                prev.filter((_, i) => i !== index)
-              )
-            }
-            className="remove-btn"
-          >
-            Remove
-          </button>
-        </li>
-      ))}
-    </ul>
-  </div>
-
-  {/* Exit Indicators */}
-  <div className="indicators-column">
-    <h3>Current Exit Indicators</h3>
-    <ul>
-      {exitIndicators.map((indicator, index) => (
-        <li key={index}>
-          {indicator.replace(':', '')}
-          <button
-            onClick={() =>
-              setExitIndicators((prev) =>
-                prev.filter((_, i) => i !== index)
-              )
-            }
-            className="remove-btn"
-          >
-            Remove
-          </button>
-        </li>
-      ))}
-    </ul>
-  </div>
-</div>
-
-
+            <div className="indicators-column">
+              <h3>Current Entry Indicators</h3>
+              <ul>
+                {entryIndicators.map((indicator, index) => (
+                  <li key={index}>
+                    {indicator}
+                    <button
+                      onClick={() =>
+                        setEntryIndicators((prev) =>
+                          prev.filter((_, i) => i !== index)
+                        )
+                      }
+                      className="remove-btn"
+                    >
+                      Remove
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="indicators-column">
+              <h3>Current Exit Indicators</h3>
+              <ul>
+                {exitIndicators.map((indicator, index) => (
+                  <li key={index}>
+                    {indicator}
+                    <button
+                      onClick={() =>
+                        setExitIndicators((prev) =>
+                          prev.filter((_, i) => i !== index)
+                        )
+                      }
+                      className="remove-btn"
+                    >
+                      Remove
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </div>

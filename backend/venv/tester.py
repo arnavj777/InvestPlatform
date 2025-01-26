@@ -1,11 +1,10 @@
-from simulation import simulation
+import os
 
-sim = simulation('VOO')
+# ---------- Getting Directory String ----------
+root_dir = os.getcwd()
+backend_dir = os.path.join(root_dir, "backend\\venv\\Datasets")
+sims_dir = os.path.join(root_dir, "backend\\venv\\Simulations")
 
-sim.add_factor_to_dataset('RSI')
-sim.add_factor_to_dataset('Volatility Ratio')
-sim.add_entry_condition('RSI', '<=30')
-sim.add_entry_condition('Volatility Ratio', ">=.2")
-sim.add_exit_condition('RSI', '>=40')
-sim.simulate()
-sim.plot_sim()
+filenames = os.listdir(sims_dir)
+
+print(filenames)
