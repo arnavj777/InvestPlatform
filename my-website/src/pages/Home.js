@@ -4,110 +4,84 @@ import HighchartsReact from 'highcharts-react-official';
 import './Home.css';
 
 function Home() {
-  // Simulation Functionality
-  const simulate = () => {
-    fetch('/run_sim', {
-      method: 'POST', // Use POST to send data
-      headers: {
-        'Content-Type': 'application/json', // Tell the server you're sending JSON
-      },
-      body: JSON.stringify({ timeframe: `${new Date(minRange).toLocaleDateString()}-${new Date(maxRange).toLocaleDateString()}` }) // Send the condition as JSON
-    })
-  }
-
-  // Exit Factor Functionality
-  const exitFactorRef = useRef();
-  const handleExitAddition = () => {
-    const factor = exitFactorRef.current.value;
-    fetch('/add_exit_f', {
-      method: 'POST', // Use POST to send data
-      headers: {
-        'Content-Type': 'application/json', // Tell the server you're sending JSON
-      },
-      body: JSON.stringify({ condition: factor }) // Send the condition as JSON
-    })
-    exitFactorRef.current.value = ""; // Clear the input field after submission
-  }
-
-  // Entry Factor Functionality
+  const [entryIndicators, setEntryIndicators] = useState([]);
+  const [exitIndicators, setExitIndicators] = useState([]);
   const entryFactorRef = useRef();
-  const handleEntryAddition = () => {
-    const factor = entryFactorRef.current.value;
-    fetch('/add_entry_f', {
-      method: 'POST', // Use POST to send data
-      headers: {
-        'Content-Type': 'application/json', // Tell the server you're sending JSON
-      },
-      body: JSON.stringify({ condition: factor }) // Send the condition as JSON
-    })
+  const exitFactorRef = useRef();
+  const symbolRef = useRef();
 
-    entryFactorRef.current.value = ""; // Clear the input field after submission
-  }
-
-  // Simulation Winow Functionality
   const [minRange, setMinRange] = useState(null);
   const [maxRange, setMaxRange] = useState(null);
-
-  // Symbol Selector Functionality
+  const [chartData, setChartData] = useState([]);
+  const [volumeData, setVolumeData] = useState([]);
   const [symbol, setSymbol] = useState('AAPL');
-  const symbolRef = useRef();
+
+  const simulate = () => {
+    if (minRange && maxRange) {
+      fetch('/run_sim', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          timeframe: `${new Date(minRange).toLocaleDateString()}-${new Date(maxRange).toLocaleDateString()}`,
+        }),
+      });
+    } else {
+      console.error('Simulation requires valid minRange and maxRange');
+    }
+  };
+
+  const handleEntryAddition = () => {
+    const factor = entryFactorRef.current.value;
+    if (factor) {
+      setEntryIndicators((prev) => [...prev, factor]);
+      fetch('/add_entry_f', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ condition: factor }),
+      });
+      entryFactorRef.current.value = '';
+    }
+  };
+
+  const handleExitAddition = () => {
+    const factor = exitFactorRef.current.value;
+    if (factor) {
+      setExitIndicators((prev) => [...prev, factor]);
+      fetch('/add_exit_f', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ condition: factor }),
+      });
+      exitFactorRef.current.value = '';
+    }
+  };
+
   const handleSymbol = () => {
     const value = symbolRef.current.value;
-
     fetch('/pipe', {
-      method: 'POST', // Use POST to send data
-      headers: {
-        'Content-Type': 'application/json', // Tell the server you're sending JSON
-      },
-      body: JSON.stringify({ symbol: value }), // Send the symbol as JSON
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ symbol: value }),
     })
       .then((response) => response.json())
       .then((data) => {
-        const chartData = [];
-        const volumeData = [];
-        const responseData = data.res;
-  
-        // Process response data to update the chart
-        responseData.forEach((item) => {
-          chartData.push([item[0], item[1], item[2], item[3], item[4]]);
-          volumeData.push([item[0], item[5]]);
-        });
-  
-        setChartData(chartData); // Update chart data state
-        setVolumeData(volumeData); // Update volume data state
-        setSymbol(value); // Update symbol in state
+        if (data.res && Array.isArray(data.res)) {
+          const chartData = [];
+          const volumeData = [];
+          data.res.forEach((item) => {
+            chartData.push([item[0], item[1], item[2], item[3], item[4]]);
+            volumeData.push([item[0], item[5]]);
+          });
+          setChartData(chartData);
+          setVolumeData(volumeData);
+          setSymbol(value);
+        } else {
+          console.error('Unexpected API response:', data);
+        }
       })
       .catch((error) => console.error('Error:', error));
-
-    symbolRef.current.value = ""; // Clear the input field after submission
-  }
-
-  const [chartData, setChartData] = useState([]);
-  const [volumeData, setVolumeData] = useState([]);
-  const [message, setMessage] = useState('');
-
-  useEffect(() => {
-    fetch('/api/data')
-      .then(response => response.json())
-      .then(data => setMessage(data.message));
-  }, []);
-
-  useEffect(() => {
-    fetch('/pipe')
-      .then(response => response.json())
-      .then((data) => {
-        const chartData = [];
-        const volumeData = [];
-        const responseData = data.res;
-
-        responseData.forEach(item => {
-          chartData.push([item[0], item[1], item[2], item[3], item[4]]);
-          volumeData.push([item[0], item[5]]);
-        });
-
-        setChartData(chartData);
-      });
-  }, []);
+    symbolRef.current.value = '';
+  };
 
   const chartOptions = {
     rangeSelector: { selected: 1 },
@@ -119,8 +93,8 @@ function Home() {
     xAxis: {
       events: {
         afterSetExtremes: (event) => {
-          setMinRange(event.min); // Store the new min value
-          setMaxRange(event.max); // Store the new max value
+          setMinRange(event.min);
+          setMaxRange(event.max);
         },
       },
     },
@@ -130,47 +104,79 @@ function Home() {
     ],
   };
 
-  const entry_click = () => {
-    console.log('entry click');
-  };
-
   return (
     <div className="app-container">
-
-      {/* Main Content */}
       <div className="main-content">
         <div className="chart-container">
-          <HighchartsReact
-            highcharts={Highcharts}
-            constructorType={'stockChart'}
-            options={chartOptions}
-          />
+          <HighchartsReact highcharts={Highcharts} constructorType={'stockChart'} options={chartOptions} />
         </div>
 
         <div className="example-section">
-          
-          {/* Symbol HTML */}
-          <input type="text" ref={symbolRef}></input>
+          <input type="text" ref={symbolRef} placeholder="Enter Symbol" />
           <button onClick={handleSymbol}>Submit</button>
 
-          {/* Window Range HTML */}
           <div>
             <p>Min Range: {minRange ? new Date(minRange).toLocaleDateString() : 'N/A'}</p>
             <p>Max Range: {maxRange ? new Date(maxRange).toLocaleDateString() : 'N/A'}</p>
           </div>
 
-          {/* Simulate HTML */}
           <button onClick={simulate}>Simulate</button>
 
-          {/* Entry Factor HTML */}
           <h3>ENTRY</h3>
-          <input type="text" ref={entryFactorRef}></input>
+          <input type="text" ref={entryFactorRef} placeholder="Add Entry Indicator" />
           <button onClick={handleEntryAddition}>Add</button>
 
-          {/* Exit Factor HTML */}
           <h3>EXIT</h3>
-          <input type="text" ref={exitFactorRef}></input>
+          <input type="text" ref={exitFactorRef} placeholder="Add Exit Indicator" />
           <button onClick={handleExitAddition}>Add</button>
+
+          {/* Two-column layout for indicators */}
+          <div className="indicators-container">
+  {/* Entry Indicators */}
+  <div className="indicators-column">
+    <h3>Current Entry Indicators</h3>
+    <ul>
+      {entryIndicators.map((indicator, index) => (
+        <li key={index}>
+          {indicator.replace(':', '')}
+          <button
+            onClick={() =>
+              setEntryIndicators((prev) =>
+                prev.filter((_, i) => i !== index)
+              )
+            }
+            className="remove-btn"
+          >
+            Remove
+          </button>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  {/* Exit Indicators */}
+  <div className="indicators-column">
+    <h3>Current Exit Indicators</h3>
+    <ul>
+      {exitIndicators.map((indicator, index) => (
+        <li key={index}>
+          {indicator.replace(':', '')}
+          <button
+            onClick={() =>
+              setExitIndicators((prev) =>
+                prev.filter((_, i) => i !== index)
+              )
+            }
+            className="remove-btn"
+          >
+            Remove
+          </button>
+        </li>
+      ))}
+    </ul>
+  </div>
+</div>
+
 
         </div>
       </div>
