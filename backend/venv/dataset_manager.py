@@ -247,3 +247,32 @@ def add_obv(symbol):
     filename = os.path.join(backend_dir, f'{symbol}_data.csv')
     data.to_csv(filename, index=False)
     print(f'Added On-Balance Volume')
+
+def getSentiment(Stock,time):
+    import os
+    import google.generativeai as genai
+
+    genai.configure(api_key=os.environ["AIzaSyBePnJjq6UcQIwgWoAAFtp6tbOK_G8tzDY"])
+
+    # Create the model
+    generation_config = {
+    "temperature": 1,
+    "top_p": 0.95,
+    "top_k": 64,
+    "max_output_tokens": 8192,
+    "response_mime_type": "text/plain",
+    }
+
+    model = genai.GenerativeModel(
+    model_name="learnlm-1.5-pro-experimental",
+    generation_config=generation_config,
+    system_instruction=f"Analyze the {Stock} over the timeperiod {time} output a number from 0 to 100, 0 being worst sentiment 100 being best sentiment",
+    )
+
+    chat_session = model.start_chat(
+    
+    )
+
+    response = chat_session.send_message("INSERT_INPUT_HERE")
+
+    return (response.text)
