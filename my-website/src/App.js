@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import Highcharts from 'highcharts/highstock';
 import HighchartsReact from 'highcharts-react-official';
 import './App.css';
+import { Searchables } from 'my-website\src\Searchables.js';
+
 
 function App() {
   const [chartData, setChartData] = useState([]);
@@ -43,7 +45,6 @@ function App() {
       { type: 'column', name: 'Volume', data: volumeData, yAxis: 1 },
     ],
   };
-
   const entry_click = () => {
     console.log('entry click');
   };
