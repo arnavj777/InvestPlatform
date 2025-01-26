@@ -38,6 +38,7 @@ def fetch_symbol(symbol):
 def get_symbol(symbol):
     data = pd.read_csv(os.path.join(backend_dir, f'{symbol}_data.csv'))
     return data
+
 def csv_to_json(symbol):
     data = pd.read_csv(os.path.join(backend_dir, f'{symbol}_data.csv'))
     json_dta = []
@@ -120,6 +121,8 @@ def add_all_factors(symbol):
     add_volatility_ratio(symbol)
     add_momentum_ratio(symbol)
     add_percent_macd(symbol)
+    add_atr(symbol)
+    add_obv(symbol)
 
 
 # RSI
@@ -208,3 +211,42 @@ def add_percent_macd(symbol):
     filename = os.path.join(backend_dir, f'{symbol}_data.csv')
     data.to_csv(filename, index=False)
     print(f'Added Percentage MACD Ratio')
+
+def add_atr(symbol):
+    data = pd.read_csv(os.path.join(backend_dir, f'{symbol}_data.csv'))
+
+    # Calculate True Range
+    data['TR'] = data[['High', 'Low', 'Close']].apply(
+        lambda x: max(x['High'] - x['Low'], 
+                      abs(x['High'] - x['Close']), 
+                      abs(x['Low'] - x['Close'])), axis=1)
+
+    # Calculate Average True Range (ATR)
+    data['ATR'] = data['TR'].rolling(window=14).mean()
+
+    # Dropping NaN Rows
+    data.dropna(inplace=True)
+    data.reset_index(drop=True, inplace=True)
+
+    # Save Data to a CSV File
+    filename = os.path.join(backend_dir, f'{symbol}_data.csv')
+    data.to_csv(filename, index=False)
+    print(f'Added Average True Range')
+
+def add_obv(symbol):
+    data = pd.read_csv(os.path.join(backend_dir, f'{symbol}_data.csv'))
+
+    # Calculate On-Balance Volume
+    data['OBV'] = 0
+    for i in range(1, len(data)):
+        if data.loc[i, 'Close'] > data.loc[i - 1, 'Close']:
+            data.loc[i, 'OBV'] = data.loc[i - 1, 'OBV'] + data.loc[i, 'Volume']
+        elif data.loc[i, 'Close'] < data.loc[i - 1, 'Close']:
+            data.loc[i, 'OBV'] = data.loc[i - 1, 'OBV'] - data.loc[i, 'Volume']
+        else:
+            data.loc[i, 'OBV'] = data.loc[i - 1, 'OBV']
+
+    # Save Data to a CSV File
+    filename = os.path.join(backend_dir, f'{symbol}_data.csv')
+    data.to_csv(filename, index=False)
+    print(f'Added On-Balance Volume')

@@ -1,19 +1,19 @@
 .app-container {
   width: 100%;
-  /* height: 100vh; */
-  background-color: #151B24;
+  background-color: #1a1f2a;
   display: flex;
   flex-direction: column;
   padding-bottom: 15px;
+  font-family: 'Arial', sans-serif;
 }
 
 .navbar {
   width: 100%;
   height: 60px;
-  background-color: #1A1E29;
+  background-color: #007bff;
   display: flex;
   align-items: center;
-  padding: 0;
+  padding: 0 0px;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
 }
 
@@ -40,29 +40,111 @@
 
 .main-content {
   width: 100%;
-  height: 100%;
-  background-color: #0D1117;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  gap: 30px;
 }
 
 .chart-container {
   width: 90%;
-  height: 60%;
-  margin-bottom: 20px;
+  
+  height: 60vh;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 15px;
 }
 
 .example-section {
   width: 90%;
-  height: 30%;
-  background-color: #2765c2;
-  border-radius: 8px;
-  padding: 10px;
+  background-color: #2a2f3a;
+  border-radius: 12px;
+  padding: 20px;
+  color: #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-wrap: wrap; /* Allow buttons to wrap */
+  gap: 20px; /* Space between buttons */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
 }
 
 .example-title {
   color: #FFFFFF;
   text-align: center;
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+}
+
+input[type="text"] {
+  width: calc(100% - 40px);
+  max-width: 400px;
+  padding: 10px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s;
+}
+
+input[type="text"]:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+button {
+  padding: 15px 30px; /* Larger padding */
+  border: none;
+  border-radius: 8px;
+  background-color: #007bff;
+  color: #fff;
+  font-size: 16px; /* Increase font size */
+  cursor: pointer;
+  transition: background-color 0.3s, box-shadow 0.3s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+button:hover {
+  background-color: #0056b3;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+h3 {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+}
+
+p {
+  font-size: 14px;
+  color: #ffffff;
+}
+.indicators-container {
+  display: flex;
+  justify-content: space-between; /* Ensure even spacing between columns */
+  gap: 20px; /* Add spacing between columns */
+  margin-top: 20px; /* Add some space above the indicators */
+  width: 100%; /* Make it span full width */
+}
+
+.indicators-column {
+  flex: 1; /* Make both columns take equal width */
+  min-width: 200px; /* Ensure columns don’t shrink too much */
+  color: #ffffff; /* Ensure text is visible */
+}
+
+.indicators-column h3 {
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+}
+
+.indicators-column ul {
+  list-style-type: none; /* Remove bullet points */
+  padding: 0; /* Remove padding from the list */
+}
+
+.indicators-column ul li {
+  margin-bottom: 8px; /* Add spacing between list items */
+  font-size: 14px;
 }
