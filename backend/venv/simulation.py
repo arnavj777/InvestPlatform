@@ -57,3 +57,4 @@ class simulation():
         plt.show()
 
 
+    

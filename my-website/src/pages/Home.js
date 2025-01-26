@@ -22,9 +22,15 @@ function Home() {
   const technicalIndicators = [
     'Moving Average',
     'RSI',
-    'MACD',
-    'Bollinger Bands',
-    'Volume',
+    'Volatility Ratio',
+    'Momentum Ratio',
+    '% MACD',
+    'ATR',
+    'OBV',
+    'Volume Ratio',
+    'Stochastic',
+    'Williams %R',
+    'CMO'
   ];
 
   const operators = ['>', '<', '>=', '<=', '='];
